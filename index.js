@@ -1,42 +1,40 @@
-"use strict";
-exports.__esModule = true;
-var express = require("express");
-var cors = require("cors");
-var firestore_1 = require("./firestore");
-var uuid_1 = require("uuid");
-var APP = express();
+import * as express from 'express';
+import * as cors from 'cors';
+import { DATA_BASE, RTDB } from './firestore';
+import { v4 as uuid } from 'uuid';
+const APP = express();
 APP.use(cors());
 APP.use(express.json());
-var PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 function main() {
-    APP.listen(PORT, function () { return console.log("inizalite in http://localhost:".concat(PORT)); });
-    var userCollection = firestore_1.DATA_BASE.collection('users');
-    var roomsCollection = firestore_1.DATA_BASE.collection('rooms');
-    APP.post('/signup', function (req, res) {
-        var email = req.body.email;
-        var name = req.body.name;
+    APP.listen(PORT, () => console.log(`inizalite in http://localhost:${PORT}`));
+    const userCollection = DATA_BASE.collection('users');
+    const roomsCollection = DATA_BASE.collection('rooms');
+    APP.post('/signup', (req, res) => {
+        const { email } = req.body;
+        const { name } = req.body;
         userCollection
             .where('email', '==', email)
             .get()
-            .then(function (result) {
+            .then((result) => {
             if (result.empty) {
-                userCollection.add({ email: email, name: name }).then(function (newUser) {
+                userCollection.add({ email: email, name: name }).then((newUser) => {
                     res.json({ id: newUser.id });
                 });
             }
             else {
                 res.status(400).json({
-                    message: 'user exist'
+                    message: 'user exist',
                 });
             }
         });
     });
-    APP.post('/signin', function (req, res) {
-        var email = req.body.email;
+    APP.post('/signin', (req, res) => {
+        const { email } = req.body;
         userCollection
             .where('email', '==', email)
             .get()
-            .then(function (result) {
+            .then((result) => {
             if (result.empty) {
                 res.status(404).json({ message: 'not found' });
             }
@@ -45,12 +43,12 @@ function main() {
             }
         });
     });
-    APP.get('/name', function (req, res) {
-        var email = req.query.email;
+    APP.get('/name', (req, res) => {
+        const { email } = req.query;
         userCollection
             .where('email', '==', email)
             .get()
-            .then(function (result) {
+            .then((result) => {
             if (result.empty) {
                 res.status(404).json({ message: 'not found' });
             }
@@ -59,21 +57,21 @@ function main() {
             }
         });
     });
-    APP.post('/rooms', function (req, res) {
-        var userId = req.body.userId;
+    APP.post('/rooms', (req, res) => {
+        const { userId } = req.body;
         userCollection
             .doc(userId)
             .get()
-            .then(function (doc) {
+            .then((doc) => {
             if (doc.exists) {
-                var roomRef_1 = firestore_1.RTDB.ref('rooms/' + (0, uuid_1.v4)());
-                roomRef_1.set({ messages: [''] }).then(function () {
-                    var longID = roomRef_1.key;
-                    var roomId = (10000 + Math.floor(Math.random() * 9999)).toString();
+                const roomRef = RTDB.ref('rooms/' + uuid());
+                roomRef.set({ messages: [''] }).then(() => {
+                    const longID = roomRef.key;
+                    const roomId = (10000 + Math.floor(Math.random() * 9999)).toString();
                     roomsCollection
                         .doc(roomId)
                         .set({ rtdbRoomId: longID })
-                        .then(function () {
+                        .then(() => {
                         res.json({ id: roomId });
                     });
                 });
@@ -83,19 +81,19 @@ function main() {
             }
         });
     });
-    APP.get('/rooms/:roomId', function (req, res) {
-        var userId = req.query.userId;
-        var roomId = req.params.roomId;
+    APP.get('/rooms/:roomId', (req, res) => {
+        const { userId } = req.query;
+        const { roomId } = req.params;
         userCollection
             .doc(userId.toString())
             .get()
-            .then(function (doc) {
+            .then((doc) => {
             if (doc.exists) {
                 roomsCollection
                     .doc(roomId)
                     .get()
-                    .then(function (snapshot) {
-                    var data = snapshot.data();
+                    .then((snapshot) => {
+                    const data = snapshot.data();
                     res.json(data);
                 });
             }
@@ -104,11 +102,11 @@ function main() {
             }
         });
     });
-    APP.post('/messages', function (req, res) {
-        var message = req.body.message;
-        var rtdb_Id = req.body.rtdb_Id;
-        var roomRef = firestore_1.RTDB.ref('rooms/' + rtdb_Id + '/messages');
-        roomRef.push(message, function () {
+    APP.post('/messages', (req, res) => {
+        const { message } = req.body;
+        const { rtdb_Id } = req.body;
+        const roomRef = RTDB.ref('rooms/' + rtdb_Id + '/messages');
+        roomRef.push(message, () => {
             res.json({ send: 'ok' });
         });
     });
