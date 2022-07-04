@@ -4,8 +4,10 @@ import { DATA_BASE, RTDB } from './firestore';
 import { v4 as uuid } from 'uuid';
 
 const APP = express();
+
 APP.use(cors());
 APP.use(express.json());
+
 const PORT = process.env.PORT || 3000;
 type Messages = {
 	from: string;
