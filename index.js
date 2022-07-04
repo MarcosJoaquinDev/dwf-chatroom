@@ -1,15 +1,17 @@
-import * as express from 'express';
-import * as cors from 'cors';
-import { DATA_BASE, RTDB } from './firestore';
-import { v4 as uuid } from 'uuid';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express = require("express");
+const cors = require("cors");
+const firestore_1 = require("./firestore");
+const uuid_1 = require("uuid");
 const APP = express();
 APP.use(cors());
 APP.use(express.json());
 const PORT = process.env.PORT || 3000;
 function main() {
     APP.listen(PORT, () => console.log(`inizalite in http://localhost:${PORT}`));
-    const userCollection = DATA_BASE.collection('users');
-    const roomsCollection = DATA_BASE.collection('rooms');
+    const userCollection = firestore_1.DATA_BASE.collection('users');
+    const roomsCollection = firestore_1.DATA_BASE.collection('rooms');
     APP.post('/signup', (req, res) => {
         const { email } = req.body;
         const { name } = req.body;
@@ -64,7 +66,7 @@ function main() {
             .get()
             .then((doc) => {
             if (doc.exists) {
-                const roomRef = RTDB.ref('rooms/' + uuid());
+                const roomRef = firestore_1.RTDB.ref('rooms/' + (0, uuid_1.v4)());
                 roomRef.set({ messages: [''] }).then(() => {
                     const longID = roomRef.key;
                     const roomId = (10000 + Math.floor(Math.random() * 9999)).toString();
@@ -105,7 +107,7 @@ function main() {
     APP.post('/messages', (req, res) => {
         const { message } = req.body;
         const { rtdb_Id } = req.body;
-        const roomRef = RTDB.ref('rooms/' + rtdb_Id + '/messages');
+        const roomRef = firestore_1.RTDB.ref('rooms/' + rtdb_Id + '/messages');
         roomRef.push(message, () => {
             res.json({ send: 'ok' });
         });
