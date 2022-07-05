@@ -15,7 +15,7 @@ type Messages = {
 };
 function main() {
 	APP.listen(PORT, () => console.log(`inizalite in http://localhost:${PORT}`));
-
+	APP.use(express.static('dist'));
 	const userCollection = DATA_BASE.collection('users');
 	const roomsCollection = DATA_BASE.collection('rooms');
 
