@@ -2,7 +2,7 @@
 ## Back:
 ### Base de datos NoSQL(firesbase)
 ### APIs Rest
-### Heroku (CI) 
+### Render (CI) 
 ## Front:
 ### Typescript
 ### Web component(-CustomElemts)
@@ -12,4 +12,4 @@
 ### express
 ### lodash
 ### uuid
-## URL  https://desafio-chat.herokuapp.com/
+## URL  https://chat-fxy1.onrender.com/
